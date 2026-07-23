@@ -31,6 +31,50 @@ pub(crate) fn resolve_identity(source: &dyn IdentitySource) -> NetworkIdentity {
     NetworkIdentity::Unknown
 }
 
+#[cfg(target_os = "linux")]
+struct PlatformSource {
+    ssid_source: linux::Nl80211Source,
+    fallback: fallback::NetdevFallback,
+}
+
+#[cfg(target_os = "macos")]
+struct PlatformSource {
+    ssid_source: macos::CoreWlanSource,
+    fallback: fallback::NetdevFallback,
+}
+
+#[cfg(any(target_os = "linux", target_os = "macos"))]
+impl IdentitySource for PlatformSource {
+    fn ssid(&self) -> Option<String> {
+        self.ssid_source.ssid()
+    }
+    fn gateway_mac(&self) -> Option<([u8; 6], Option<IpAddr>)> {
+        self.fallback.gateway_mac()
+    }
+}
+
+#[cfg(target_os = "linux")]
+fn platform_source() -> PlatformSource {
+    PlatformSource {
+        ssid_source: linux::Nl80211Source,
+        fallback: fallback::NetdevFallback,
+    }
+}
+
+#[cfg(target_os = "macos")]
+fn platform_source() -> PlatformSource {
+    PlatformSource {
+        ssid_source: macos::CoreWlanSource,
+        fallback: fallback::NetdevFallback,
+    }
+}
+
+#[cfg(any(target_os = "linux", target_os = "macos"))]
+pub fn current_identity() -> NetworkIdentity {
+    resolve_identity(&platform_source())
+}
+
+#[cfg(not(any(target_os = "linux", target_os = "macos")))]
 pub fn current_identity() -> NetworkIdentity {
     NetworkIdentity::Unknown
 }
@@ -87,5 +131,12 @@ mod tests {
             gateway_mac: None,
         };
         assert_eq!(resolve_identity(&source), NetworkIdentity::Unknown);
+    }
+
+    #[test]
+    fn current_identity_does_not_panic() {
+        // Environment-dependent end-to-end check across whichever real
+        // platform source is compiled in for this OS.
+        let _ = current_identity();
     }
 }
