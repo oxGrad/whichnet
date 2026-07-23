@@ -1,0 +1,14 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "command": "hivemind session-start",
+            "type": "command"
+          }
+        ]
+      }
+    ]
+  }
+}
