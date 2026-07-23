@@ -1,5 +1,7 @@
 use std::net::IpAddr;
 
+mod fallback;
+
 #[derive(Debug, PartialEq, Eq)]
 pub enum NetworkIdentity {
     Ssid(String),
