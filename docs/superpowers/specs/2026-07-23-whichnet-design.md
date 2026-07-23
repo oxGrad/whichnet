@@ -29,7 +29,8 @@ network state, without needing to know why a fallback occurred.
   platform module via `#[cfg]`.
 - `src/linux.rs` (cfg(target_os = "linux")) — SSID via `nl80211` crate.
 - `src/macos.rs` (cfg(target_os = "macos")) — SSID via `objc2-core-wlan`.
-- `src/fallback.rs` — gateway MAC via `default-net`, shared by both platforms.
+- `src/fallback.rs` — gateway MAC via `netdev` (the maintained successor to
+  `default-net`, same author, same API shape), shared by both platforms.
 - Internal `trait IdentitySource` boundary separating identity-lookup logic from
   the platform FFI/netlink calls, so fallback ordering is unit-testable without
   a real network/OS call.
@@ -55,12 +56,14 @@ approach used by third-party tools such as get-ssid-rs) — that path is fragile
 
 ### Fallback (both platforms)
 
-Default-gateway MAC address via the `default-net` crate (maintained,
-cross-platform, single API, works on Wi-Fi and wired). Subnet included as a
-secondary distinguisher when available. Trade-off (accepted, carried over from
-the original hivenet decision): weaker signal than exact SSID — two networks
-sharing an unconfigured/default router's gateway MAC would collide — but
-buildable today, testable in CI, no privileged OS calls required.
+Default-gateway MAC address via the `netdev` crate (`default-net`'s maintained
+successor — `default-net` is deprecated/rebranded upstream; `netdev` keeps the
+same cross-platform, single-API shape, works on Wi-Fi and wired). Subnet
+included as a secondary distinguisher when available. Trade-off (accepted,
+carried over from the original hivenet decision): weaker signal than exact
+SSID — two networks sharing an unconfigured/default router's gateway MAC
+would collide — but buildable today, testable in CI, no privileged OS calls
+required.
 
 If neither SSID nor gateway MAC can be determined, return `Unknown`.
 
