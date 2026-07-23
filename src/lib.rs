@@ -11,7 +11,7 @@ pub enum NetworkIdentity {
     Ssid(String),
     GatewayMac {
         mac: [u8; 6],
-        subnet: Option<IpAddr>,
+        gateway_ip: Option<IpAddr>,
     },
     Unknown,
 }
@@ -25,8 +25,8 @@ pub(crate) fn resolve_identity(source: &dyn IdentitySource) -> NetworkIdentity {
     if let Some(ssid) = source.ssid() {
         return NetworkIdentity::Ssid(ssid);
     }
-    if let Some((mac, subnet)) = source.gateway_mac() {
-        return NetworkIdentity::GatewayMac { mac, subnet };
+    if let Some((mac, gateway_ip)) = source.gateway_mac() {
+        return NetworkIdentity::GatewayMac { mac, gateway_ip };
     }
     NetworkIdentity::Unknown
 }
@@ -119,7 +119,7 @@ mod tests {
             resolve_identity(&source),
             NetworkIdentity::GatewayMac {
                 mac: [1, 2, 3, 4, 5, 6],
-                subnet: Some("192.168.1.1".parse().unwrap()),
+                gateway_ip: Some("192.168.1.1".parse().unwrap()),
             }
         );
     }
