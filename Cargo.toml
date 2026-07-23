@@ -2,6 +2,12 @@
 name = "whichnet"
 version = "0.1.0"
 edition = "2024"
+description = "Detect the current network's identity (Wi-Fi SSID, falling back to gateway MAC) on Linux and macOS"
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/oxGrad/whichnet"
+keywords = ["network", "wifi", "ssid", "netlink", "corewlan"]
+categories = ["network-programming", "os"]
 
 [dependencies]
 netdev = { version = "0.45.0", features = ["gateway"] }
