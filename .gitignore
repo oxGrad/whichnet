@@ -1,3 +1,4 @@
 /target
 /docs
 .hivemind.local.toml
+.claude/
