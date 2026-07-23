@@ -5,3 +5,6 @@ edition = "2024"
 
 [dependencies]
 netdev = { version = "0.45.0", features = ["gateway"] }
+
+[target.'cfg(target_os = "linux")'.dependencies]
+nl80211 = "0.0.2"

@@ -1,6 +1,8 @@
 use std::net::IpAddr;
 
 mod fallback;
+#[cfg(target_os = "linux")]
+mod linux;
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum NetworkIdentity {
