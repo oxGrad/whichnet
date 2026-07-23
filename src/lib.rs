@@ -3,6 +3,8 @@ use std::net::IpAddr;
 mod fallback;
 #[cfg(target_os = "linux")]
 mod linux;
+#[cfg(target_os = "macos")]
+mod macos;
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum NetworkIdentity {

@@ -568,6 +568,7 @@ version = "0.1.0"
 dependencies = [
  "netdev",
  "nl80211",
+ "objc2-core-wlan",
 ]
 
 [[package]]
