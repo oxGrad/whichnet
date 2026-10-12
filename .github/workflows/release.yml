@@ -7,21 +7,52 @@ on:
 
 jobs:
   verify-version:
-    uses: oxHive/pipelines/.github/workflows/rust-verify-version.yml@v2
-    with:
-      package-name: whichnet
+    runs-on: ubuntu-latest
+    steps:
+      - uses: oxHive/pipelines/.github/actions/rust-verify-version@v2
+        with:
+          package-name: whichnet
 
   check:
     needs: verify-version
-    uses: oxHive/pipelines/.github/workflows/rust-check.yml@v2
+    runs-on: ubuntu-latest
+    steps:
+      - uses: oxHive/pipelines/.github/actions/rust-check@v2
 
+  # Library crate: no binaries to attach, so the shared github-release action
+  # (which packages build artifacts and checksums) doesn't fit.
   github-release:
     needs: check
-    uses: oxHive/pipelines/.github/workflows/shared-github-release.yml@v2
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Generate changelog
+        uses: orhun/git-cliff-action@v4
+        with:
+          config: cliff.toml
+          args: --latest --strip header
+        env:
+          OUTPUT: CHANGES.md
+          GITHUB_REPO: ${{ github.repository }}
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v3
+        with:
+          body_path: CHANGES.md
+          prerelease: ${{ contains(github.ref_name, '-rc') }}
 
   publish-crates:
     needs: github-release
-    uses: oxHive/pipelines/.github/workflows/rust-publish-crates.yml@v2
+    runs-on: ubuntu-latest
     permissions:
       id-token: write
       contents: read
+    steps:
+      - uses: oxHive/pipelines/.github/actions/rust-publish-crates@v2
