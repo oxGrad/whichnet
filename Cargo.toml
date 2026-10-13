@@ -1,6 +1,6 @@
 [package]
 name = "whichnet"
-version = "0.2.0"
+version = "0.1.0"
 edition = "2024"
 description = "Detect the current network's identity (Wi-Fi SSID, falling back to gateway MAC) on Linux and macOS"
 license = "MIT"
